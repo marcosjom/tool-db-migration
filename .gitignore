@@ -33,4 +33,4 @@ go.work.sum
 
 # Tmp data
 *.sql
-*/__debug.bin.exe*
+*__debug*

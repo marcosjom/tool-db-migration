@@ -84,9 +84,9 @@ func ToMariaDbStr_InsertStatement(st2 *tsqlparser.InsertStatement) (string, erro
 			// 01234567890123456789012345678901234567890123
 			// CAST(N'YYYY-MM-DDThh:mm:ss.mmm' AS DATETIME)
 			if len(valueStr) == 44 &&
-				strings.ToUpper(valueStr[:len("CAST(N'")]) == "CAST(N'" &&
-				strings.ToUpper(valueStr[17:18]) == "T" &&
-				strings.ToUpper(valueStr[30:]) == "' AS DATETIME)" {
+				strings.EqualFold(valueStr[:len("CAST(N'")], "CAST(N'") &&
+				strings.EqualFold(valueStr[17:18], "T") &&
+				strings.EqualFold(valueStr[30:], "' AS DATETIME)") {
 				valueStr = "'" + valueStr[7:17] + " " + valueStr[18:30] + "'"
 			}
 			//
