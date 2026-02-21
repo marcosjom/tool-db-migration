@@ -24,10 +24,16 @@ func ToMariaDbStr(st2 *tsqlparser.CreateTableStatement) (string, error) {
 	for _, c := range st2.Columns {
 		fieldName := c.Name.Value
 		typeStr := c.DataType.Name
+		typeSuffix := ""
 		// Fix TEXT to LONGTEXT: in SQLServer TEXT can be 2^31 - 1 long, but in MySQL just 64K long.
 		if len(typeStr) == 4 && strings.ToUpper(typeStr) == "TEXT" {
 			fmt.Fprintf(os.Stderr, "Changing SqlServer(TEXT) field type to MySQL(LONGTEXT) to fit data.\n")
 			typeStr = "LONGTEXT"
+		}
+		// Fix TINYINT to TINYINT UNSIGNED: in SQLServer TINYINT is unsigned, but in MySQL is signed.
+		if strings.EqualFold(typeStr, "TINYINT") {
+			fmt.Fprintf(os.Stderr, "Changing `%s`.`%s` from %s to TINYINT UNSIGNED.\n", tableName, fieldName, typeStr)
+			typeSuffix = "UNSIGNED"
 		}
 		//
 		typeSz := ""
@@ -62,7 +68,7 @@ func ToMariaDbStr(st2 *tsqlparser.CreateTableStatement) (string, error) {
 			strBldr.WriteString(", ")
 		}
 		defsCount++
-		strBldr.WriteString("`" + c.Name.Value + "` " + typeStr + typeSz + " " + nullable)
+		strBldr.WriteString("`" + c.Name.Value + "` " + typeStr + typeSz + " " + typeSuffix + " " + nullable)
 		if c.Identity != nil {
 			if autoExists {
 				return "", errors.New("Only one AUTO_INCREMENT field is allowed per Table.")
