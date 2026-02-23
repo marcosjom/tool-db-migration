@@ -215,6 +215,14 @@ func run(cfg *runConfig) bool {
 					return false
 				}
 				fmt.Println(sql)
+			case *tsqlparser.CreateIndexStatement:
+				sql, error := sqlbuilder.ToMariaDbStr_CreateIndexStatement(st2)
+				if error != nil {
+					fmt.Fprintf(os.Stderr, "\n%s\n", st2.String())
+					fmt.Fprintf(os.Stderr, "ERROR CreateIndexStatement, : %s.\n", error.Error())
+					return false
+				}
+				fmt.Println(sql)
 			case *tsqlparser.InsertStatement:
 				sql, error := sqlbuilder.ToMariaDbStr_InsertStatement(st2)
 				if error != nil {

@@ -34,3 +34,6 @@ go.work.sum
 # Tmp data
 *.sql
 *__debug*
+*/__debug.bin.exe*
+.DS_Store
+src/db_migrate
