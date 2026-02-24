@@ -10,64 +10,13 @@ import (
 	"github.com/marcosjom/db_migrate/pkg/sqlbuilder"
 )
 
-type runConfig struct {
-	InputFile  string //tsql source file
-	OutputFile string //sql destination file (stdout as default)
-}
-
 func main() {
 
-	//
-	cfg := runConfig{}
-
-	//arguments
-	args := os.Args
-	argsLen := len(args)
-
-	//program's location
-	/*if argsLen > 0 {
-		fmt.Fprintf(os.Stderr, "Progam '%s'\n", args[0])
-	}*/
-
-	//parse arguments
+	// Parse arguments
 	iArg := 1
-	iArgLastRun := iArg
-	for iArg < argsLen {
-		v := args[iArg]
-		switch v {
-		case "-i", "-inputFile":
-			if iArg+1 >= argsLen {
-				fmt.Fprintf(os.Stderr, "Missing value for argument '%s'\n", v)
-				os.Exit(-1)
-			}
-			iArg++
-			cfg.InputFile = args[iArg]
-		case "-o", "-outputFile":
-			if iArg+1 >= argsLen {
-				fmt.Fprintf(os.Stderr, "Missing value for argument '%s'\n", v)
-				os.Exit(-1)
-			}
-			iArg++
-			cfg.OutputFile = args[iArg]
-		case "-r", "-run":
-			//Execute with current params-state
-			iArgLastRun = iArg + 1
-			if !run(&cfg) {
-				fmt.Fprintf(os.Stderr, "Run failed.\n")
-				os.Exit(-1)
-			}
-		default:
-			fmt.Fprintf(os.Stderr, "Unknown argument '%s'\n", v)
-			os.Exit(-1)
-		}
-		iArg++
-	}
-
-	//flush config changes
-	if iArgLastRun != iArg {
-		iArgLastRun = iArg
-		if !run(&cfg) {
-			fmt.Fprintf(os.Stderr, "Run failed.\n")
+	for _, arg := range os.Args[1:] {
+		if !run(arg) {
+			fmt.Fprintf(os.Stderr, "Run failed for: %s.\n", arg)
 			os.Exit(-1)
 		}
 	}
@@ -75,20 +24,15 @@ func main() {
 	//Help
 	if iArg == 1 {
 		fmt.Fprintf(os.Stderr, "\n")
-		fmt.Fprintf(os.Stderr, "This program parses a MS SQL Server tsql batches file and outputs its equivalent for Mysql/MariaDb.\n")
+		fmt.Fprintf(os.Stderr, "This program parses a MS SQL Server tsql batches file and outputs its equivalent for MariaDb.\n")
 		fmt.Fprintf(os.Stderr, "Useful for rapid database migration.\n")
 		fmt.Fprintf(os.Stderr, "\n")
 		fmt.Fprintf(os.Stderr, "Usage:\n")
-		fmt.Fprintf(os.Stderr, "tsql2sql [args]\n")
-		fmt.Fprintf(os.Stderr, "\n")
-		fmt.Fprintf(os.Stderr, "Arguments:\n")
-		fmt.Fprintf(os.Stderr, "-i | -inputFile file , sets the current input file.\n")
-		fmt.Fprintf(os.Stderr, "-o | -ouputFile file , sets the current output file (def: stdout).\n")
-		fmt.Fprintf(os.Stderr, "-r | -run            , runs the parser with the current configuration state (optional for last cfg changes).\n")
+		fmt.Fprintf(os.Stderr, "tsql2sql file1 file2 ...\n")
 		fmt.Fprintf(os.Stderr, "\n")
 		fmt.Fprintf(os.Stderr, "Examples:\n")
-		fmt.Fprintf(os.Stderr, "tsql2sql -i myFile.tsql\n")
-		fmt.Fprintf(os.Stderr, "tsql2sql -i myFile.tsql -o myFile.sql -run -i myFile2.tsql -o myFile2.sql -run\n")
+		fmt.Fprintf(os.Stderr, "tsql2sql myFile.tsql > myNewFile.sql\n")
+		fmt.Fprintf(os.Stderr, "tsql2sql myFile.tsql myFile2.tsql > myNewFile.sql\n")
 	}
 
 	//
@@ -109,7 +53,7 @@ func main() {
 	//fmt.Fprintf(os.Stderr, "Done!\n")
 }
 
-func run(cfg *runConfig) bool {
+func run(inputPath string) bool {
 	processBatch := func(batch []rune, goLine []rune) bool {
 		const startComment = "/*"
 		const endComment = "*/"
@@ -286,5 +230,5 @@ func run(cfg *runConfig) bool {
 		return true
 	}
 	//action
-	return parser.ParseFilepathTsqlBatches(cfg.InputFile, processBatch)
+	return parser.ParseFilepathTsqlBatches(inputPath, processBatch)
 }
