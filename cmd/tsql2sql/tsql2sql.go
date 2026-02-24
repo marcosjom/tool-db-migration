@@ -6,14 +6,13 @@ import (
 	"strings"
 
 	"github.com/ha1tch/tsqlparser"
-	"github.com/marcosjom/db_migrate/src/pkg/parser"
-	"github.com/marcosjom/db_migrate/src/pkg/sqlbuilder"
+	"github.com/marcosjom/db_migrate/pkg/parser"
+	"github.com/marcosjom/db_migrate/pkg/sqlbuilder"
 )
 
 type runConfig struct {
 	InputFile  string //tsql source file
 	OutputFile string //sql destination file (stdout as default)
-	UseDb      string //db-name to use in "USE db;" statements
 }
 
 func main() {
@@ -50,13 +49,6 @@ func main() {
 			}
 			iArg++
 			cfg.OutputFile = args[iArg]
-		case "-db", "-useDb":
-			if iArg+1 >= argsLen {
-				fmt.Fprintf(os.Stderr, "Missing value for argument '%s'\n", v)
-				os.Exit(-1)
-			}
-			iArg++
-			cfg.UseDb = args[iArg]
 		case "-r", "-run":
 			//Execute with current params-state
 			iArgLastRun = iArg + 1
@@ -87,17 +79,16 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Useful for rapid database migration.\n")
 		fmt.Fprintf(os.Stderr, "\n")
 		fmt.Fprintf(os.Stderr, "Usage:\n")
-		fmt.Fprintf(os.Stderr, "tsql2mysql [args]\n")
+		fmt.Fprintf(os.Stderr, "tsql2sql [args]\n")
 		fmt.Fprintf(os.Stderr, "\n")
 		fmt.Fprintf(os.Stderr, "Arguments:\n")
 		fmt.Fprintf(os.Stderr, "-i | -inputFile file , sets the current input file.\n")
 		fmt.Fprintf(os.Stderr, "-o | -ouputFile file , sets the current output file (def: stdout).\n")
-		fmt.Fprintf(os.Stderr, "-db | -useDb name    , sets the current replacement name for USE db statements (def: empty).\n")
 		fmt.Fprintf(os.Stderr, "-r | -run            , runs the parser with the current configuration state (optional for last cfg changes).\n")
 		fmt.Fprintf(os.Stderr, "\n")
 		fmt.Fprintf(os.Stderr, "Examples:\n")
-		fmt.Fprintf(os.Stderr, "tsql2mysql -i myFile.tsql\n")
-		fmt.Fprintf(os.Stderr, "tsql2mysql -i myFile.tsql -o myFile.sql -run -i myFile2.tsql -o myFile2.sql -run\n")
+		fmt.Fprintf(os.Stderr, "tsql2sql -i myFile.tsql\n")
+		fmt.Fprintf(os.Stderr, "tsql2sql -i myFile.tsql -o myFile.sql -run -i myFile2.tsql -o myFile2.sql -run\n")
 	}
 
 	//
@@ -290,7 +281,6 @@ func run(cfg *runConfig) bool {
 			}
 			fmt.Println(startComment + goLineStr + endComment)
 		}
-
 		//fmt.Fprintf(os.Stderr, "Program: %d bytes\n", len(program.String()))
 		//
 		return true
