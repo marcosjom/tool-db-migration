@@ -67,9 +67,9 @@ func ToMariaDbStr_InsertStatement(st2 *tsqlparser.InsertStatement) (string, erro
 				*/
 				//Data Issue, found  DEL (0x7F) character in 4 INSERT statements.
 				{
-					delStr := string(rune(0x7F))
+					const delStr = string(rune(0x7F))
 					if strings.Contains(strOnly, delStr) {
-						strOnly = strings.ReplaceAll(strOnly, string(rune(0x7F)), "_")
+						strOnly = strings.ReplaceAll(strOnly, delStr, "_")
 						fmt.Fprintf(os.Stderr, "\n%s\n", st2.String())
 						fmt.Fprintf(os.Stderr, "Found DEL (0x7F) char inside string, using \"_\" as a replacement.\n")
 					}
