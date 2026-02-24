@@ -28,5 +28,12 @@ go.work.sum
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
+
+# Tmp data
+*.sql
+*__debug*
+*/__debug.bin.exe*
+.DS_Store
+src/db_migrate
