@@ -2,7 +2,7 @@
 
 Tool for migrating sql-server schema/data scripts to maria-db and other formats (if modified).
 
-Created by [Marcos Ortega](https://mortegam.com/) for a specific migration of a system multi-GBs-databases from SQL Server to MariaDB. You can use it or modify it to your needs.
+Created by [Marcos Ortega](https://mortegam.com/) for a specific migration of a multi-GBs-databases system from SQL Server to MariaDB. You can use it or modify it to your needs.
 
 # Features
 
@@ -24,16 +24,16 @@ Output:
   - Create Index Statements
   - Alter Table Statements
   - Insert Statements
-- Converts types (ex: mssql-tinyint to mariadb-tinyint-unsigned).
-- Creates unique indexes if and auto-increment field is not primery-key.
+- Converts types (ex: mssql-tinyint to mariadb-tinyint-unsigned for compatibility).
+- Creates unique indexes if an auto-increment field is not primery-key.
 - Outputs MariaDB compatible sql.
 
 # Compile it (Windows, Linux, Mac)
 
 ```
 cd tool-db-migration
-go get [github.com/marcosjom/tool-db-migration](https://github.com/marcosjom/tool-db-migration)
-go build cmd/tsql2sql
+go get github.com/marcosjom/tool-db-migration
+go build cmd/tsql2sql/tsql2sql.go
 ```
 
 # Run it (Windows, Linux, Mac)
@@ -42,13 +42,19 @@ go build cmd/tsql2sql
 ./tsql2sql myFile.tsql > myNewFile.sql
 ```
 
+And then create or import your database.
+
+```
+mysql ... < myNewFile.sql
+```
+
 # Dependencies
 
 Thanks to [ha1tch](https://github.com/ha1tch) for his [tsql parser](https://github.com/ha1tch/tsqlparser).
 
 # Contact
 
-Visit [mortegam.com](https://mortegam.com/) to see this project running a website on Linux.
+Visit [mortegam.com](https://mortegam.com/) for other projects.
 
 May you be surrounded by passionate and curious people. :-)
 
